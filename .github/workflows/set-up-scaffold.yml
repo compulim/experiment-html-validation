@@ -3,10 +3,11 @@ name: Set up scaffold
 on:
   push:
     branches: ['main']
+  workflow_dispatch:
 
 jobs:
   setup:
-    if: ${{ github.run_number == 1 && github.repository != 'compulim/template-react-esbuild' }}
+    if: ${{ github.repository != 'compulim/template-react-esbuild' }}
     runs-on: ubuntu-latest
 
     steps:
