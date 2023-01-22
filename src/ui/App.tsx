@@ -48,6 +48,7 @@ const App = () => {
       <h1>Hello, World!</h1>
       <form aria-errormessage="error-message" aria-invalid={!!errorMessage} noValidate={true} onSubmit={handleSubmit}>
         <input
+          autoFocus={true}
           onChange={handleTextBoxChange}
           onInvalid={handleTextBoxInvalid}
           placeholder="Type a number"
@@ -57,13 +58,13 @@ const App = () => {
         />
         {/* "aria-describedby" will narrate IDREF after "send button".
             However, "aria-labelledby" narrate before "send button". */}
-        <input aria-describedby="error-message" type="submit" value="Send" />
+        <input xaria-describedby="error-message" type="submit" value="Send" />
         {/* WORKING: <div aria-live="assertive" aria-relevant="all" id="error-message"> */}
         {/* Edge + Narrator: "aria-relevant" must be at least "additions removals".
                              If "text" is present, will narrate "group" which is not desirable.
                              "group" is not suppressable by "aria-labelledby" or "aria-roledescription" */}
-        <div aria-live="assertive" aria-relevant="additions removals" id="error-message">
-          <span aria-atomic={true}>{errorMessage}</span>
+        <div id="error-message" role="alert">
+          {errorMessage}
         </div>
       </form>
     </Fragment>
