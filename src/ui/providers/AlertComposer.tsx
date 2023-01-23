@@ -3,6 +3,8 @@ import AlertContext from './private/AlertContext';
 
 import type { CSSProperties, PropsWithChildren } from 'react';
 
+const HIDE_ALERT_AFTER_MS = 1000;
+
 const STYLE: CSSProperties = {
   color: 'transparent',
   height: 1,
@@ -18,20 +20,39 @@ type Props = PropsWithChildren<{
 }>;
 
 const AlertComposer = ({ alertClassName, children }: Props) => {
-  const [messageObject, setMessage] = useState({ message: '' });
+  const [messageObject, setMessageObject] = useState<{ message: string }>({ message: '' });
   const alertElementRef = useRef<HTMLSpanElement | null>(null);
 
-  const showAlert = useCallback((message: string): void => setMessage({ message }), [setMessage]);
+  const showAlert = useCallback((message: string): void => setMessageObject({ message }), [setMessageObject]);
 
   const contextValue = useMemo(() => ({ showAlert }), [showAlert]);
 
   useEffect(() => {
-    const { current: alertElement } = alertElementRef;
+    let { current: alertElement } = alertElementRef;
 
-    if (alertElement) {
-      alertElement.innerText = '';
-      alertElement.innerText = messageObject.message;
+    if (!alertElement) {
+      return;
     }
+
+    alertElement.innerText = '';
+
+    if (!messageObject.message) {
+      return;
+    }
+
+    alertElement.innerText = messageObject.message;
+
+    // Hides/removes alert message after queued to the screen reader.
+    // This prevents screen reader from picking it up by narrating the whole page, such as CAPSLOCK + DOWN.
+    setTimeout(() => {
+      if (alertElement) {
+        alertElement.innerText = '';
+      }
+    }, HIDE_ALERT_AFTER_MS);
+
+    return () => {
+      alertElement = null;
+    };
   }, [alertElementRef, messageObject]);
 
   return (
