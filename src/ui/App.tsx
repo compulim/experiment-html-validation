@@ -1,8 +1,10 @@
 import { ChangeEventHandler, FormEventHandler, Fragment, useCallback, useState } from 'react';
+import useShowAlert from './providers/useShowAlert';
 
 const App = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [value, setValue] = useState('');
+  const showAlert = useShowAlert();
 
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     event => {
@@ -15,12 +17,15 @@ const App = () => {
 
       if (isValid) {
         console.log('form.onSubmit');
-        formElement.reset();
+        showAlert('');
+
+        return formElement.reset();
       }
 
-      // TODO: On every "onSubmit", we should clear and renarrate.
-      //       Then, on every click, the end-user will hear "cannot submit". Rather than the first click.
-      setErrorMessage(isValid ? '' : 'Cannot submit');
+      // // TODO: On every "onSubmit", we should clear and renarrate.
+      // //       Then, on every click, the end-user will hear "cannot submit". Rather than the first click.
+      // setErrorMessage(isValid ? '' : 'Cannot submit');
+      showAlert('Sorry, I cannot submit this form.');
     },
     [setErrorMessage]
   );
@@ -56,16 +61,13 @@ const App = () => {
           type="text"
           value={value}
         />
-        {/* "aria-describedby" will narrate IDREF after "send button".
-            However, "aria-labelledby" narrate before "send button". */}
-        <input xaria-describedby="error-message" type="submit" value="Send" />
-        {/* WORKING: <div aria-live="assertive" aria-relevant="all" id="error-message"> */}
+        <input name="abc" type="hidden" />
+        <input type="submit" value="Send" />
+        {/* WORKING: <div aria-live="assertive" aria-relevant="all"> */}
         {/* Edge + Narrator: "aria-relevant" must be at least "additions removals".
                              If "text" is present, will narrate "group" which is not desirable.
                              "group" is not suppressable by "aria-labelledby" or "aria-roledescription" */}
-        <div id="error-message" role="alert">
-          {errorMessage}
-        </div>
+        {/* WORKING: <div role="alert">{errorMessage}</div> */}
       </form>
     </Fragment>
   );
